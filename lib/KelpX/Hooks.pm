@@ -1,5 +1,7 @@
 package KelpX::Hooks;
 
+our $VERSION = '1.01';
+
 use strict;
 use warnings;
 use Exporter qw(import);
@@ -9,12 +11,13 @@ our @EXPORT = qw(
 	hook
 );
 
-our $VERSION = '1.00';
-
 sub hook
 {
 	my ($subname, $decorator) = @_;
-	my ($package) = caller;
+	my $package = caller;
+
+	croak "Hooking build() method is forbidden"
+		if $subname eq "build";
 
 	my $build_method = $package->can("build");
 	croak "Can't hook $subname: no build() method in $package"
