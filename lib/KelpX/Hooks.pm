@@ -27,7 +27,7 @@ sub hook
 	no warnings 'redefine';
 
 	*{"${package}::build"} = sub {
-		my $self = shift;
+		my ($self) = @_;
 
 		my $hooked_method = $package->can($subname);
 		croak "Trying to hook $subname, which doesn't exist"
@@ -41,9 +41,7 @@ sub hook
 				scalar $decorator->($hooked_method, $kelp, @args);
 		};
 
-		return wantarray ?
-			$self->$build_method(@_) :
-			scalar $self->$build_method(@_);
+		goto $build_method;
 	};
 	return;
 }
@@ -88,6 +86,10 @@ This module fights the symbol table magic with more symbol table magic. It will 
 Allows you to provide your own subroutine in place of the one specified. The first argument is the subroutine that's being replaced. It won't be run at all unless you call it explicitly.
 
 Please note that Kelp::Less is not supported.
+
+=head1 CAVEATS
+
+This module works by replacing the build method in symbol tables. Because of this, you cannot hook the build method itself.
 
 =head1 SEE ALSO
 
