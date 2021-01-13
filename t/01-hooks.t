@@ -2,14 +2,16 @@ use strict;
 use warnings;
 
 use Test::More;
-BEGIN { use_ok('KelpX::Hooks') };
+BEGIN { use_ok('KelpX::Hooks') }
 
 {
+
 	package HooksTest1;
 	use Kelp::Base 'Kelp';
 	use KelpX::Hooks;
 
-	sub _load_config {
+	sub _load_config
+	{
 		my ($self) = @_;
 		$self->SUPER::_load_config();
 		$self->load_module("JSON");
@@ -21,18 +23,21 @@ BEGIN { use_ok('KelpX::Hooks') };
 }
 
 {
+
 	package HooksTest2;
 	use Kelp::Base 'Kelp';
 	use KelpX::Hooks;
 	use Test::More;
 
-	sub _load_config {
+	sub _load_config
+	{
 		my ($self) = @_;
 		$self->SUPER::_load_config();
 		$self->load_module("JSON");
 	}
 
-	sub build {
+	sub build
+	{
 		my ($self) = @_;
 
 		can_ok $self, 'json';
@@ -40,8 +45,9 @@ BEGIN { use_ok('KelpX::Hooks') };
 		is($self->something, 50, "this package method hooked");
 	}
 
-	sub something {
-		13
+	sub something
+	{
+		13;
 	}
 
 	hook "json" => sub {
@@ -52,11 +58,12 @@ BEGIN { use_ok('KelpX::Hooks') };
 
 	hook "something" => sub {
 		my ($orig, $self, @args) = @_;
-		return $self->$orig(@args) + 37
+		return $self->$orig(@args) + 37;
 	};
 }
 
 {
+
 	package HooksTest3;
 	use Kelp::Base 'Kelp';
 	use KelpX::Hooks;
@@ -83,6 +90,5 @@ CANNOT_HOOK_IF_NOT_EXIST: {
 	my $e = $@;
 	like($e, qr/hook not_here/, "no method found ok");
 }
-
 
 done_testing(7);

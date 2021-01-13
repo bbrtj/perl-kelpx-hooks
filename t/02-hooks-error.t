@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 
 {
+
 	package BuildHook;
 	use Kelp::Base 'Kelp';
 	use KelpX::Hooks;
@@ -22,6 +23,7 @@ use Test::More;
 }
 
 {
+
 	package NotKelp;
 	use KelpX::Hooks;
 	use Test::More;

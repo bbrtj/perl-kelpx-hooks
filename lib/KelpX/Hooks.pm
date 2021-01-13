@@ -36,8 +36,10 @@ sub hook
 		*{"${package}::$subname"} = sub {
 			my ($kelp, @args) = @_;
 
-			return wantarray ?
-				$decorator->($hooked_method, $kelp, @args) :
+			return wantarray
+				?
+				$decorator->($hooked_method, $kelp, @args)
+				:
 				scalar $decorator->($hooked_method, $kelp, @args);
 		};
 
@@ -45,7 +47,6 @@ sub hook
 	};
 	return;
 }
-
 
 1;
 __END__
