@@ -18,19 +18,30 @@ BEGIN { use_ok('KelpX::Hooks') };
 	hook "json" => sub {
 		return "not json anymore";
 	};
-
-	1;
 }
 
 {
 	package HooksTest2;
 	use Kelp::Base 'Kelp';
 	use KelpX::Hooks;
+	use Test::More;
 
 	sub _load_config {
 		my ($self) = @_;
 		$self->SUPER::_load_config();
 		$self->load_module("JSON");
+	}
+
+	sub build {
+		my ($self) = @_;
+
+		can_ok $self, 'json';
+		is($self->json(["this shouldn't be an object"]), '["this shouldn\'t be an object"]', "method replacement ok");
+		is($self->something, 37, "this package method hooked");
+	}
+
+	sub something {
+		13
 	}
 
 	hook "json" => sub {
@@ -39,7 +50,9 @@ BEGIN { use_ok('KelpX::Hooks') };
 		return $self->$orig->encode(@args);
 	};
 
-	1;
+	hook "something" => sub {
+		37
+	};
 }
 
 {
@@ -52,19 +65,23 @@ BEGIN { use_ok('KelpX::Hooks') };
 
 		return $self->$orig->encode(@args);
 	};
-
-	1;
 }
 
-my $app = HooksTest1->new;
-is($app->json, "not json anymore", "method replacement ok");
+HOOKS_WORK: {
+	my $app = HooksTest1->new;
+	is($app->json, "not json anymore", "method replacement ok");
+}
 
-$app = HooksTest2->new;
-is($app->json(["test"]), '["test"]', "method replacement ok");
+HOOKS_AVAILABLE_IN_BUILD: {
+	my $app = HooksTest2->new;
+	is($app->json(["test"]), '["test"]', "method replacement ok");
+}
 
-eval { $app = HooksTest3->new; };
-my $e = $@;
-ok($e, "exception caught during construction");
-like($e, qr/hook not_here/, "no method found");
+CANNOT_HOOK_IF_NOT_EXIST: {
+	eval { my $app = HooksTest3->new; };
+	my $e = $@;
+	like($e, qr/hook not_here/, "no method found ok");
+}
 
-done_testing();
+
+done_testing(7);
