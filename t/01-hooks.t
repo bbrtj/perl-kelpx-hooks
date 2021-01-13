@@ -37,7 +37,7 @@ BEGIN { use_ok('KelpX::Hooks') };
 
 		can_ok $self, 'json';
 		is($self->json(["this shouldn't be an object"]), '["this shouldn\'t be an object"]', "method replacement ok");
-		is($self->something, 37, "this package method hooked");
+		is($self->something, 50, "this package method hooked");
 	}
 
 	sub something {
@@ -51,7 +51,8 @@ BEGIN { use_ok('KelpX::Hooks') };
 	};
 
 	hook "something" => sub {
-		37
+		my ($orig, $self, @args) = @_;
+		return $self->$orig(@args) + 37
 	};
 }
 
